@@ -103,11 +103,6 @@ export class NgxIgvComponent implements OnDestroy {
   browser$: ResourceRef<any> = resource({
     request: this.igvDiv$,
     loader: async (param) => {
-      if (igv) {
-        console.log('igv already loaded');
-      } else {
-        console.log('loader');
-      }
       const element = param.request?.nativeElement;
       if (!element) {
         return;
