@@ -1,2 +1,6 @@
-/* Import Tailwind styles directly into Shadow DOM */
-@import "tailwindcss";
+/* Component-specific styles for VisageComponent */
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

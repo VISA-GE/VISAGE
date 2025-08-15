@@ -7,7 +7,7 @@ import { AppComponent } from './app/app.component';
   standalone: true,
   imports: [GenomeSelectorComponent, AppComponent],
   templateUrl: './visage.component.html',
-  styleUrl: './visage.component.css',
+  styleUrls: ['./theme.css', './visage.component.css'],
   encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class VisageComponent {
