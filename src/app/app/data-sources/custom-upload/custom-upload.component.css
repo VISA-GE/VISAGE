@@ -1,0 +1,60 @@
+mat-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+  display: block;
+}
+
+input[type="file"] {
+  margin-bottom: 15px;
+  display: block;
+  padding: 8px;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  border: 1px solid var(--color-primary-300);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  margin-right: 12px;
+  font-size: 0.875rem;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: var(--color-primary-100);
+  border-color: var(--color-primary-400);
+}
+
+.elevation {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  margin-right: 8px;
+}
+
+/* Any custom styles not covered by Tailwind */
+
+/* Staggered animation for the step transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content-animate {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Make sure select arrow doesn't overlap with text */
+select {
+  padding-right: 2rem;
+}

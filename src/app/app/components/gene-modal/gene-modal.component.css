@@ -1,0 +1,135 @@
+.pill-tab {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  transition: all var(--transition-normal);
+  border: 1px solid var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.pill-tab:hover {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+  box-shadow: var(--shadow-sm);
+}
+
+.pill-tab.active {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border-color: var(--color-primary-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.track-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-700);
+  transition: all var(--transition-normal);
+}
+
+.pill-tab:hover .track-count {
+  background-color: var(--color-primary-200);
+  color: var(--color-primary-700);
+}
+
+.pill-tab.active .track-count {
+  background-color: var(--color-primary-300);
+  color: var(--color-primary-800);
+}
+
+.tab-content {
+  min-height: 200px;
+}
+
+/* Add Track button style (used for View Pathway and Close buttons) */
+.add-track-btn {
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-primary-200);
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.add-track-btn:hover {
+  background-color: var(--color-primary-200);
+  border-color: var(--color-primary-300);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2),
+              0 2px 4px -1px rgba(67, 56, 202, 0.1);
+}
+
+.add-track-btn:active {
+  transform: translateY(0) scale(0.98);
+  background-color: var(--color-primary-300);
+  box-shadow: none;
+}
+
+/* Scrollbar styling for the table */
+.overflow-auto::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: var(--color-neutral-100);
+  border-radius: 6px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-300);
+  border-radius: 6px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neutral-400);
+}
+
+/* Fixed header for table */
+thead.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* CDK Dialog classes */
+::ng-deep .gene-modal-backdrop {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+::ng-deep .gene-modal-dialog-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .cdk-dialog-container {
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

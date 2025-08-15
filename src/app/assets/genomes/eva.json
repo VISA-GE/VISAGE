@@ -1,0 +1,42 @@
+{
+  "hg38": {
+    "evaSpecies": "hsapiens_grch38",
+    "trackHubId": "GCA_000001405.15"
+  },
+  "hg38_1kg": {
+    "evaSpecies": "hsapiens_grch38",
+    "trackHubId": "GCA_000001405.15"
+  },
+  "hg19": {
+    "evaSpecies": "hsapiens_grch37",
+    "trackHubId": "GCA_000001405.1"
+  },
+  "mm39": {
+    "evaSpecies": "mmusculus_grcm39",
+    "trackHubId": "GCA_000001635.9"
+  },
+  "mm10": {
+    "evaSpecies": "mmusculus_grcm38",
+    "trackHubId": "GCA_000001635.2"
+  },
+  "rn6": {
+    "evaSpecies": "rnorvegicus_60",
+    "trackHubId": "GCA_000001895.4"
+  },
+  "danRer10": {
+    "evaSpecies": "drerio_grcz10",
+    "trackHubId": "GCA_000002035.3"
+  },
+  "ce11": {
+    "evaSpecies": "caenorhabditis_elegans",
+    "trackHubId": "GCA_000002985.3"
+  },
+  "dm6": {
+    "evaSpecies": "dmelanogaster_6",
+    "trackHubId": "GCA_000001215.4"
+  },
+  "sacCer3": {
+    "evaSpecies": "scerevisiae_r64",
+    "trackHubId": "GCA_000146045.2"
+  }
+}

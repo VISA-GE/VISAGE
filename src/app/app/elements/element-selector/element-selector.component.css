@@ -1,0 +1,20 @@
+/* Prevent dropdown from closing immediately when clicking on dropdown items */
+.dropdown-item {
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+/* Make selected item stand out better */
+.dropdown-item.selected {
+  background-color: rgba(59, 130, 246, 0.1);
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Ensure dropdown is always at the front */
+.element-selector-dropdown {
+  z-index: 9999 !important;
+}

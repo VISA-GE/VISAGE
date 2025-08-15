@@ -1,0 +1,21 @@
+.genes-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content-section {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Container styling */
+.genes-container {
+  background-color: #f9fafb;
+  min-height: 100%;
+}
+
+/* Empty state styling */
+.text-neutral-500 {
+  color: #6b7280;
+}

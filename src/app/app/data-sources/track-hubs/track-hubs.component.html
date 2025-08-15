@@ -1,0 +1,89 @@
+<!-- Track Hub Component -->
+<div class="track-hub-container">
+  <!-- Loading Animation -->
+  @if (isLoading()) {
+  <div class="flex justify-center items-center h-full w-full">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+  </div>
+  } @else {
+  <div class="header-section px-4 pt-4">
+    <h2 class="text-xl font-semibold mb-4">Track Hubs</h2>
+
+    <!-- Pill Tab Navigation with wrapping -->
+    <div class="tabs-container mb-4">
+      <div class="tabs-wrapper">
+        <div class="flex flex-wrap gap-2">
+          @for (groupName of groupedTracks() | keyvalue; track groupName.key; let i = $index) {
+          <button class="pill-tab" [class.active]="i === activeTabIndex" (click)="setActiveTab(i)">
+            {{ groupName.key }}
+            <span class="track-count">{{ groupName.value.length }}</span>
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content with scrolling -->
+  <div class="tab-content">
+    @for (groupName of groupedTracks() | keyvalue; track groupName.key; let i = $index) {
+    <div class="tab-pane" [class.hidden]="i !== activeTabIndex">
+      <div class="tab-pane-content px-4 pb-4">
+        <div class="grid-container">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (track of groupName.value; track track.shortLabel; let trackIndex = $index) {
+            <div class="scientific-card p-4 hover:shadow-md transition-all duration-200 staggered-card"
+              [attr.data-index]="trackIndex" [class.track-already-added]="isTrackAdded()(track)">
+              <div class="flex flex-col h-full">
+                <div class="flex items-start justify-between mb-2">
+                  <h3 class="font-medium text-base">{{ track.shortLabel }}</h3>
+                  @if (isTrackAdded()(track)) {
+                  <div class="flex items-center text-green-600 text-xs font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                    Added
+                  </div>
+                  }
+                </div>
+                <p class="text-sm text-neutral-600 mt-1 mb-3">{{ track.longLabel }}</p>
+                <div class="mt-auto">
+                  @if (isTrackAdded()(track)) {
+                  <div class="flex gap-2">
+                    <button class="action-btn-disabled px-3 py-1.5 rounded-md text-sm flex-1" disabled>
+                      Already Added
+                    </button>
+                    <button class="remove-btn px-3 py-1.5 rounded-md text-sm" (click)="removeTrack(track)"
+                      title="Remove track">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                      </svg>
+                    </button>
+                  </div>
+                  } @else {
+                  <button class="action-btn px-3 py-1.5 rounded-md text-sm w-full" (click)="addTrack(track)">
+                    Add Track
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+
+          @if (groupName.value.length === 0) {
+          <div class="text-center py-6 text-neutral-500">
+            No tracks available in this category
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

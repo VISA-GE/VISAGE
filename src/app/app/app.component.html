@@ -1,0 +1,58 @@
+<div class="flex h-screen">
+  <lib-sidebar class="h-full"></lib-sidebar>
+  <main class="flex-1 overflow-auto p-6">
+    @switch (page()) {
+    @case ('track-hubs') {
+    <lib-track-hubs></lib-track-hubs>
+    }
+    @case ('custom-upload') {
+    <lib-custom-upload></lib-custom-upload>
+    }
+    @case ('igv') {
+    <lib-element-selector></lib-element-selector>
+    <lib-element-tracker></lib-element-tracker>
+    <div class="flex gap-4 mt-4">
+      <button
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        [disabled]="visibleGenesCount() > 20" (click)="selectAllVisibleGenes()">
+        Select all {{ visibleGenesCount() }} visible genes
+      </button>
+      <button
+        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        [disabled]="location().chr === 'all' || !location().range || isFetchingSNPs"
+        (click)="fetchSNPsInVisibleRegion()">
+        @if (!isFetchingSNPs) {
+        Fetch SNPs in visible region
+        } @else {
+        <span class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          Fetching SNPs...
+        </span>
+        }
+      </button>
+    </div>
+    @if (isFetchingSNPs) {
+    <div class="mt-2 text-sm text-gray-600">
+      Fetching SNPs in batches to comply with EVA API rate limits. Large regions may take a moment.
+    </div>
+    }
+    <lib-igv></lib-igv>
+    }
+    @case ('genes') {
+    <lib-genes></lib-genes>
+    }
+    @case ('drugst-one') {
+    <lib-drugst-one></lib-drugst-one>
+    }
+    }
+  </main>
+</div>
+
+<!-- Toast Container -->
+<lib-toast-container></lib-toast-container>

@@ -1,0 +1,22 @@
+<div class="genes-container">
+  <div class="header-section px-4 pt-4">
+    <h2 class="text-xl font-semibold mb-4">Genes</h2>
+    <lib-element-selector></lib-element-selector>
+  </div>
+
+  <div class="content-section px-4 pb-4 mt-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for(gene of genes(); track gene.name; let i = $index) {
+      <div [attr.data-index]="i">
+        <lib-gene [gene]="gene"></lib-gene>
+      </div>
+      }
+
+      @if (genes().length === 0) {
+      <div class="text-center py-6 text-neutral-500 col-span-full">
+        No genes added. Use the selector above to add genes.
+      </div>
+      }
+    </div>
+  </div>
+</div>

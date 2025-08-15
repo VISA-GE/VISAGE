@@ -1,0 +1,25 @@
+<div class="relative w-full">
+  <div class="flex items-center w-full">
+    <input type="text" [ngModel]="currentGeneInput()" (ngModelChange)="currentGeneInput.set($event)"
+      (input)="handleInputChange()" (keydown)="handleKeyDown($event)" (focus)="showDropdown.set(true)"
+      (blur)="showDropdown.set(false)" placeholder="Search for genes..."
+      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+  </div>
+
+  <!-- Dropdown for gene search results -->
+  @if(showDropdown()) {
+  <div
+    class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto element-selector-dropdown">
+    @for(gene of filteredGenes(); track gene.name; let i = $index) {
+    <div (mousedown)="handleGeneSelection(gene.name)" (mouseover)="selectItem(i)"
+      [class.selected]="selectedIndex() === i" class="px-4 py-2 cursor-pointer dropdown-item">
+      {{ gene.name }}
+    </div>
+    } @empty {
+    <div class="px-4 py-2 text-gray-500">
+      No genes found
+    </div>
+    }
+  </div>
+  }
+</div>

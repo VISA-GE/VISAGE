@@ -1,0 +1,21 @@
+<div class="w-full">
+  <!-- Search input with dropdown -->
+
+
+  <!-- Selected genes chips -->
+  <div class="flex flex-wrap gap-2 mt-3">
+    @for(geneName of geneNames(); track geneName) {
+    <div class="flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full gene-chip">
+      <span class="cursor-pointer" (click)="focusGene(geneName)">
+        {{ geneName }}
+      </span>
+      <button (click)="remove(geneName)" class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none"
+        aria-label="Remove gene">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    }
+  </div>
+</div>

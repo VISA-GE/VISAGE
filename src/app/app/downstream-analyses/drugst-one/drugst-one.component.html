@@ -1,0 +1,15 @@
+<lib-element-selector></lib-element-selector>
+<lib-element-tracker></lib-element-tracker>
+<div class="mt-4"></div>
+
+@if (genes().length > 0) {
+<drugst-one
+  config='{"identifier":"symbol","title":"Interactions of selected genes","nodeShadow":true,"edgeShadow":false,"autofillEdges":true, "animation":true, "activateNetworkMenuButtonAdjacentDrugs": true, "interactionDrugProtein": "NeDRex", "licensedDatasets": true}'
+  groups='{"nodeGroups":{"important":{"type":"gene","color":"#ff881f","font":{"color":"#000000"},"groupName":"Important Gene","shape":"star"},"gene":{"type":"gene","color":"#4da300","font":{"color":"#f0f0f0"},"groupName":"Gene","shape":"circle"},"foundDrug":{"type":"drug","color":"#F12590","font":{"color":"#000000"},"groupName":"Drug","shape":"diamond"}},"edgeGroups":{"default":{"color":"#000000","groupName":"default edge"}}}'
+  network='{{networkString()}}'>
+</drugst-one>
+} @else {
+<div class="flex flex-col items-center justify-center h-64">
+  <p class="text-neutral-500">No genes added. Use the selector above to add genes.</p>
+</div>
+}

@@ -1,0 +1,142 @@
+@if (isOpen()) {
+<div class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center" (click)="close.emit()">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        (click)="$event.stopPropagation()">
+        <!-- Fixed header -->
+        <div class="p-4 border-b flex justify-between items-center bg-neutral-50">
+            <h2 class="text-xl font-semibold text-primary-700">{{ gene().name }} Details</h2>
+            <button (click)="close.emit()" class="text-neutral-400 hover:text-neutral-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Tab Navigation - Fixed -->
+        <div class="px-6 pt-4 pb-2 bg-white">
+            <div class="flex flex-wrap gap-2">
+                <button class="pill-tab" [class.active]="activeTab() === 'info'" (click)="setActiveTab('info')">
+                    Basic Info
+                </button>
+                <button class="pill-tab" [class.active]="activeTab() === 'pathways'" (click)="setActiveTab('pathways')">
+                    Pathways
+                    @if (pathways().length > 0) {
+                    <span class="track-count">{{ pathways().length }}</span>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area - Flexible height with scrolling -->
+        <div class="flex-1 overflow-hidden">
+            <!-- Basic Info Tab -->
+            @if (activeTab() === 'info') {
+            <div class="p-6 overflow-y-auto h-full tab-content-animate">
+                <div class="space-y-4">
+                    <div class="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                        <h3 class="font-medium text-primary-700 mb-2">Description</h3>
+                        <p class="text-neutral-700">{{ description() | async }}</p>
+                    </div>
+
+                    <div class="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+                        <h3 class="font-medium text-primary-700 mb-2">Genomic Location</h3>
+                        <p class="text-neutral-700 font-mono">{{ gene().chr }}:{{ gene().range?.start }}-{{
+                            gene().range?.end }}
+                            @if (gene().strand) {
+                            <span class="ml-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs">{{
+                                gene().strand }} strand</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+            }
+
+            <!-- Pathways Tab -->
+            @if (activeTab() === 'pathways') {
+            <div class="flex flex-col h-full">
+                @if (pathways().length === 0) {
+                <div class="p-6 flex-1 overflow-y-auto tab-content-animate">
+                    <div class="text-center py-12 bg-neutral-50 rounded-lg border border-neutral-200">
+                        <svg class="w-12 h-12 mx-auto text-neutral-300 mb-3" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        <p class="text-neutral-500 font-medium">No pathways associated with this gene</p>
+                    </div>
+                </div>
+                } @else {
+                <div class="w-full flex flex-col h-full tab-content-animate">
+                    <!-- Fixed Table Header -->
+                    <div class="px-6 pt-6">
+                        <div class="w-full border-t border-l border-r border-neutral-200 rounded-t-lg">
+                            <table class="w-full table-fixed">
+                                <thead class="bg-neutral-50">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider w-[30%]">
+                                            Name</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider w-[45%]">
+                                            Description</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider w-[25%]">
+                                            Actions</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Table Body -->
+                    <div class="px-6 flex-1 overflow-y-auto">
+                        <div class="w-full border-b border-l border-r border-neutral-200 rounded-b-lg">
+                            <table class="w-full table-fixed">
+                                <tbody class="bg-white divide-y divide-neutral-200">
+                                    @for (pathway of pathways(); track pathway.id) {
+                                    <tr class="hover:bg-neutral-50 transition-colors">
+                                        <td class="px-6 py-4 text-sm font-medium text-neutral-900 break-words w-[30%]">
+                                            {{ pathway.name | htmlDecode }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-neutral-600 break-words w-[45%]">
+                                            {{ pathway.description | htmlDecode }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm w-[25%]">
+                                            <a href="https://www.wikipathways.org/pathways/{{ pathway.id }}.html"
+                                                target="_blank" class="action-btn inline-flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Fixed Footer -->
+        <div class="p-6 pt-4 border-t bg-white">
+            <div class="flex justify-end">
+                <button class="action-btn px-5 py-2.5 rounded-full" (click)="close.emit()">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}

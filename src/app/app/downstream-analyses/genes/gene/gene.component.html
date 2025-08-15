@@ -1,0 +1,43 @@
+<div class="scientific-card p-4 hover:shadow-md transition-all duration-200 staggered-card relative">
+  <button (click)="removeGene()"
+    class="absolute top-2 right-2 text-neutral-400 hover:text-neutral-700 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+  <div class="flex flex-col h-full">
+    <h3 class="font-medium text-base">{{ gene().name }}</h3>
+    <p class="text-sm text-neutral-600 mb-3">{{ description() | async }}</p>
+
+    <p class="text-sm text-neutral-600 mt-1 mb-3">
+      {{ gene().chr }}:{{ gene().range?.start }}-{{ gene().range?.end }}
+      @if (gene().strand) {
+      <span class="ml-1">({{ gene().strand }})</span>
+      }
+    </p>
+    @if (pathways().length > 0) {
+    <div class="mb-3">
+      <p class="text-sm text-neutral-500 mb-1">Pathways</p>
+      <div class="flex flex-wrap gap-1">
+        @for (pathway of pathways(); track pathway.id) {
+        <button class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs">
+          {{ pathway.name }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+    <div class="mt-auto flex gap-2">
+      <button class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-md text-sm cursor-pointer"
+        (click)="focusGene()">
+        View in IGV
+      </button>
+      <button class="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-md text-sm cursor-pointer"
+        (click)="showGeneModal()">
+        More details
+      </button>
+    </div>
+  </div>
+</div>
