@@ -1,6 +1,6 @@
 {
-  "name": "visage",
-  "version": "0.0.0",
+  "name": "@visa-ge/visage",
+  "version": "0.2.0",
   "main": "bundle.js",
   "scripts": {
     "ng": "ng",
@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^19.1.0",
     "@angular/cdk": "^19.2.19",
