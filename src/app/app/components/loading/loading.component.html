@@ -1,0 +1,6 @@
+<div class="loading-container" [class.full-height]="fullHeight">
+    <div class="loading-spinner" [ngClass]="'spinner-' + size"></div>
+    @if (showMessage) {
+    <p class="loading-text">{{ message }}</p>
+    }
+</div>

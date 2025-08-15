@@ -4,10 +4,11 @@ import { State } from '../../../state.store';
 import { Track } from 'ngx-igv';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast/toast.service';
+import { LoadingComponent } from '../../components/loading/loading.component';
 
 @Component({
   selector: 'lib-track-hubs',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingComponent],
   templateUrl: './track-hubs.component.html',
   styleUrl: './track-hubs.component.css',
 })
