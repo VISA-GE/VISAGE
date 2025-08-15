@@ -9,7 +9,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { ResourceRef, resource } from '@angular/core';
-import isEqual from 'lodash/isEqual.js';
+import { isEqual } from 'lodash-es';
 
 //@ts-ignore
 declare const igv: any;
