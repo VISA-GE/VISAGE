@@ -22,6 +22,7 @@ import { AppComponent } from './app/app.component';
 export class VisageComponent {
   @Output() genomeIdChange = new EventEmitter<string | null>();
   @Output() selectedGenesChange = new EventEmitter<string>();
+  @Output() selectedRegionsChange = new EventEmitter<string>();
 
   @Input({ alias: 'genome-id' })
   set genomeId(value: string | null) {
@@ -37,6 +38,24 @@ export class VisageComponent {
     this.state.setGeneNames(parsed);
   }
 
+  @Input({ alias: 'selected-regions' })
+  set selectedRegions(value: string | null) {
+    if (value) {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          this.state.setSelectedRegions(parsed);
+        } else {
+          console.warn('selected-regions must be a JSON array');
+        }
+      } catch (error) {
+        console.warn('Invalid JSON format for selected-regions:', error);
+      }
+    } else {
+      this.state.setSelectedRegions([]);
+    }
+  }
+
   state = inject(State);
   hasGenome = computed(() => this.state.genomeId() !== null);
 
@@ -49,6 +68,11 @@ export class VisageComponent {
     effect(() => {
       const currentGeneNames = Array.from(this.state.geneNames());
       this.selectedGenesChange.emit(currentGeneNames.join(','));
+    });
+
+    effect(() => {
+      const currentRegions = this.state.selectedRegions();
+      this.selectedRegionsChange.emit(JSON.stringify(currentRegions));
     });
   }
 }
