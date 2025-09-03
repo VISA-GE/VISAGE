@@ -71,6 +71,7 @@ type VisageState = {
   tracks: Track[];
   geneNames: Set<string>;
   snps: SNP[];
+  selectedRegions: NamedGenomicRange[];
   searchedRegions: {
     chr: string;
     range: {
@@ -89,6 +90,7 @@ const initialState: VisageState = {
   tracks: [],
   geneNames: new Set(['SOX10']),
   snps: [],
+  selectedRegions: [],
   searchedRegions: [],
 };
 
@@ -169,6 +171,22 @@ export const State = signalStore(
   withMethods((store) => {
     const toastService = inject(ToastService);
 
+    // Helper function to add a region with duplicate checking
+    const addRegionWithDuplicateCheck = (region: NamedGenomicRange) => {
+      const existingRegions = store.selectedRegions();
+      const isDuplicate = existingRegions.some(
+        (existingRegion) => existingRegion.name === region.name
+      );
+
+      if (isDuplicate) {
+        toastService.warning(`Region "${region.name}" is already selected!`);
+        return;
+      }
+
+      patchState(store, { selectedRegions: [...existingRegions, region] });
+      toastService.success(`Region "${region.name}" successfully added!`);
+    };
+
     return {
       setLocation: (location: Location) => patchState(store, { location }),
       setGenomeId: (genomeId: string | null) => patchState(store, { genomeId }),
@@ -180,6 +198,7 @@ export const State = signalStore(
           tracks: [],
           geneNames: new Set<string>(),
           snps: [],
+          selectedRegions: [],
           searchedRegions: [],
         }),
       addTrack: (track: Track) => {
@@ -219,6 +238,49 @@ export const State = signalStore(
       setPage: (page: VisagePage) => patchState(store, { page }),
       setGeneNames: (geneNames: string[]) =>
         patchState(store, { geneNames: new Set(geneNames) }),
+      addSelectedRegion: (region: NamedGenomicRange) => {
+        addRegionWithDuplicateCheck(region);
+      },
+      removeSelectedRegionByIndex: (index: number) => {
+        const existingRegions = store.selectedRegions();
+        if (index >= 0 && index < existingRegions.length) {
+          const removedRegion = existingRegions[index];
+          const updatedRegions = existingRegions.filter((_, i) => i !== index);
+          patchState(store, { selectedRegions: updatedRegions });
+          toastService.info(`Region "${removedRegion.name}" removed`);
+        }
+      },
+      removeSelectedRegionByName: (name: string) => {
+        const existingRegions = store.selectedRegions();
+        const updatedRegions = existingRegions.filter(
+          (region) => region.name !== name
+        );
+
+        if (updatedRegions.length < existingRegions.length) {
+          patchState(store, { selectedRegions: updatedRegions });
+          toastService.info(`Region "${name}" removed`);
+        }
+      },
+      setSelectedRegions: (regions: NamedGenomicRange[]) => {
+        patchState(store, { selectedRegions: regions });
+      },
+      addCurrentLocationAsRegion: (name: string) => {
+        const currentLocation = store.location();
+        if (currentLocation.chr === 'all') {
+          toastService.warning(
+            'Cannot add region: no specific chromosome is focused'
+          );
+          return;
+        }
+
+        const region: NamedGenomicRange = {
+          ...currentLocation,
+          name,
+          type: 'custom',
+        };
+
+        addRegionWithDuplicateCheck(region);
+      },
     };
   }),
   withComputed((store) => ({
