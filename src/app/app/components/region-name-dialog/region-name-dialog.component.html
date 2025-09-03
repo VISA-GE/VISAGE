@@ -1,0 +1,23 @@
+<div class="p-6 max-w-md mx-auto">
+    <h2 class="text-lg font-semibold mb-4">{{ title() }}</h2>
+
+    <div class="mb-4">
+        <label for="regionName" class="block text-sm font-medium text-gray-700 mb-2">
+            Region Name
+        </label>
+        <input type="text" id="regionName" [(ngModel)]="regionName" [placeholder]="placeholder()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            (keyup.enter)="onConfirm()" autofocus />
+    </div>
+
+    <div class="flex justify-end space-x-3">
+        <button type="button" (click)="onCancel()"
+            class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+            {{ cancelText() }}
+        </button>
+        <button type="button" (click)="onConfirm()" [disabled]="!regionName.trim()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+            {{ confirmText() }}
+        </button>
+    </div>
+</div>

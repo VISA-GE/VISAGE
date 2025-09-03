@@ -1,7 +1,9 @@
 import { Component, effect, inject, computed } from '@angular/core';
+import { Dialog } from '@angular/cdk/dialog';
 import { State } from '../../../state.store';
 import { ElementSelectorComponent } from '../element-selector/element-selector.component';
 import { ElementTrackerComponent } from '../element-tracker/element-tracker.component';
+import { RegionNameDialogComponent } from '../../components/region-name-dialog/region-name-dialog.component';
 
 @Component({
   selector: 'app-element-overview',
@@ -12,7 +14,9 @@ import { ElementTrackerComponent } from '../element-tracker/element-tracker.comp
 })
 export class ElementOverviewComponent {
   state = inject(State);
+  dialog = inject(Dialog);
   visibleGenesCount = computed(() => this.state.visibleGenes().length);
+  selectedRegions = computed(() => this.state.selectedRegions());
   location = this.state.location;
   isFetchingSNPs = false;
 
@@ -22,6 +26,16 @@ export class ElementOverviewComponent {
       const geneNames = visibleGenes.map((gene) => gene.name);
       this.state.addGeneNames(geneNames);
     }
+  }
+
+  focusRegion(region: any): void {
+    // Focus the view on the selected region
+    this.state.setLocation(region);
+  }
+
+  removeRegion(regionName: string): void {
+    // Remove the region by name
+    this.state.removeSelectedRegionByName(regionName);
   }
 
   async fetchSNPsInVisibleRegion(): Promise<void> {
@@ -57,6 +71,38 @@ export class ElementOverviewComponent {
       console.error('Error fetching SNPs:', error);
     } finally {
       this.isFetchingSNPs = false;
+    }
+  }
+
+  async saveCurrentRegion(): Promise<void> {
+    const location = this.location();
+
+    // Check if we have a specific chromosome and range
+    if (location.chr === 'all') {
+      console.warn('Cannot save region: no specific chromosome is focused');
+      return;
+    }
+
+    if (!location.range) {
+      console.warn('Cannot save region: no specific range is selected');
+      return;
+    }
+
+    // Open the dialog to get the region name
+    const dialogRef = this.dialog.open<string>(RegionNameDialogComponent, {
+      data: {
+        title: 'Save Current Region',
+        placeholder: 'Enter a name for this region...',
+        confirmText: 'Save Region',
+        cancelText: 'Cancel',
+      },
+    });
+
+    const result = await dialogRef.closed.toPromise();
+
+    if (result) {
+      // Use the existing method to add the region
+      this.state.addCurrentLocationAsRegion(result);
     }
   }
 }
