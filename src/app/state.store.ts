@@ -217,6 +217,8 @@ export const State = signalStore(
         patchState(store, initialState);
       },
       setPage: (page: VisagePage) => patchState(store, { page }),
+      setGeneNames: (geneNames: string[]) =>
+        patchState(store, { geneNames: new Set(geneNames) }),
     };
   }),
   withComputed((store) => ({

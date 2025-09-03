@@ -21,10 +21,20 @@ import { AppComponent } from './app/app.component';
 })
 export class VisageComponent {
   @Output() genomeIdChange = new EventEmitter<string | null>();
+  @Output() selectedGenesChange = new EventEmitter<string>();
 
   @Input({ alias: 'genome-id' })
   set genomeId(value: string | null) {
     this.state.setGenomeId(value ?? null);
+  }
+
+  @Input({ alias: 'selected-genes' })
+  set selectedGenes(value: string | null) {
+    const parsed = (value ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    this.state.setGeneNames(parsed);
   }
 
   state = inject(State);
@@ -34,6 +44,11 @@ export class VisageComponent {
     effect(() => {
       const currentGenomeId = this.state.genomeId();
       this.genomeIdChange.emit(currentGenomeId);
+    });
+
+    effect(() => {
+      const currentGeneNames = Array.from(this.state.geneNames());
+      this.selectedGenesChange.emit(currentGeneNames.join(','));
     });
   }
 }

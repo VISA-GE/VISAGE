@@ -33,12 +33,6 @@ export class AppComponent {
   location = this.state.location;
   isFetchingSNPs = false;
 
-  constructor() {
-    effect(() => {
-      console.log(this.state.genePathways());
-    });
-  }
-
   selectAllVisibleGenes(): void {
     const visibleGenes = this.state.visibleGenes();
     if (visibleGenes.length <= 20) {
