@@ -5,9 +5,14 @@
 <div class="flex flex-wrap gap-2 mt-3">
   @for(region of selectedRegions(); track region.name) {
   <div class="flex items-center px-3 py-1 bg-orange-100 text-orange-800 rounded-full region-chip">
-    <span class="cursor-pointer" (click)="focusRegion(region)">
-      {{ region.name }}
-    </span>
+    <div class="flex flex-col">
+      <span class="cursor-pointer font-medium" (click)="focusRegion(region)">
+        {{ region.name }}
+      </span>
+      <span class="text-xs text-orange-600">
+        {{ region.chr }}:{{ region.range?.start?.toLocaleString() }}-{{ region.range?.end?.toLocaleString() }}
+      </span>
+    </div>
     <button (click)="removeRegion(region.name)" class="ml-2 text-orange-600 hover:text-orange-800 focus:outline-none"
       aria-label="Remove region">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
