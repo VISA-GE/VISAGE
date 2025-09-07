@@ -29,6 +29,11 @@
                 "glob": "package.json",
                 "input": ".",
                 "output": "/"
+              },
+              {
+                "glob": "README.md",
+                "input": ".",
+                "output": "/"
               }
             ],
             "styles": [

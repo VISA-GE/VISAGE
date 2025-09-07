@@ -1,59 +1,89 @@
 # Visage
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.4.
+Visage is a genomic visualization component built with Angular that provides an interactive genome browser interface. This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.4.
 
-## Development server
+## Component Interface
 
-To start a local development server, run:
+The main component `VisageComponent` provides the following interfaces for integration:
 
-```bash
-ng serve
+### Input Properties
+
+- **`genome-id`** (string | null): Sets the genome identifier for visualization
+- **`selected-genes`** (string | null): Comma-separated list of gene names to highlight
+- **`selected-regions`** (string | null): JSON array of genomic regions to display
+
+### Output Events
+
+- **`genomeIdChange`**: Emits when the genome ID changes
+- **`selectedGenesChange`**: Emits when selected genes change (comma-separated string)
+- **`selectedRegionsChange`**: Emits when selected regions change (JSON string)
+
+### Usage Example
+
+```html
+<visage-component 
+  [genome-id]="'hg38'"
+  [selected-genes]="'BRCA1,BRCA2'"
+  [selected-regions]="'[{\"chr\":\"chr17\",\"start\":43000000,\"end\":43100000}]'"
+  (genomeIdChange)="onGenomeChange($event)"
+  (selectedGenesChange)="onGenesChange($event)"
+  (selectedRegionsChange)="onRegionsChange($event)">
+</visage-component>
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Data Interfaces
 
-## Code scaffolding
+The component uses the following TypeScript interfaces:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+#### Location Interface
+```typescript
+interface Location {
+  chr: string;
+  range?: {
+    start: number;
+    end: number;
+  };
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+#### Track Interface
+```typescript
+interface Track {
+  type?: 'annotation' | 'wig' | 'alignment' | 'variant' | 'seg' | 'mut' | 'interact' | 'gwas' | 'arc' | 'junction' | 'qtl' | 'pytor' | 'merged' | 'sequence';
+  sourceType?: 'file' | 'htsget' | 'custom';
+  format?: string;
+  name: string;
+  url: string;
+  indexURL?: string;
+  indexed?: boolean;
+  order?: number;
+  color?: string;
+  height?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  visibilityWindow?: string;
+  removable?: boolean;
+  headers?: {};
+  oauthToken?: string;
+  displayMode?: 'SQUISHED' | 'EXPANDED' | 'FULL';
+}
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+#### Reference Interface
+```typescript
+interface Reference {
+  id: string;
+  name?: string;
+  assembly?: string;
+  fastaURL?: string;
+  indexURL?: string;
+  compressedIndexURL?: string;
+  twoBitURL?: string;
+  cytobandURL?: string;
+  aliasURL?: string;
+  chromSizesURL?: string;
+  chromosomeOrder?: string;
+  headers?: {};
+  wholeGenomeView?: boolean;
+}
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
