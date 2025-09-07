@@ -3,6 +3,7 @@ import { CommonModule, AsyncPipe } from '@angular/common';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { NamedGenomicRange, Pathway } from '../../../state.store';
 import { HtmlDecodePipe } from '../../pipes/html-decode.pipe';
+import { BaseDialogComponent } from '../base-dialog/base-dialog.component';
 
 export interface GeneModalData {
   gene: NamedGenomicRange;
@@ -12,38 +13,14 @@ export interface GeneModalData {
 
 @Component({
   selector: 'lib-gene-modal',
-  imports: [CommonModule, AsyncPipe, HtmlDecodePipe],
+  imports: [CommonModule, AsyncPipe, HtmlDecodePipe, BaseDialogComponent],
   template: `
-    <div
-      class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto flex flex-col"
+    <lib-base-dialog
+      [title]="gene.name + ' Details'"
+      maxWidth="max-w-2xl"
+      maxHeight="max-h-[90vh]"
     >
-      <!-- Fixed header -->
-      <div class="p-4 border-b flex justify-between items-center bg-neutral-50">
-        <h2 class="text-xl font-semibold text-primary-700">
-          {{ gene.name }} Details
-        </h2>
-        <button
-          (click)="dialogRef.close()"
-          class="text-neutral-400 hover:text-neutral-700 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Tab Navigation - Fixed -->
+      <!-- Tab Navigation -->
       <div class="px-6 pt-4 pb-2 bg-white">
         <div class="flex flex-wrap gap-2">
           <button
@@ -66,25 +43,23 @@ export interface GeneModalData {
       </div>
 
       <!-- Content Area -->
-      <div class="flex-1 overflow-y-auto">
+      <div class="px-6 pb-6">
         <!-- Basic Info Tab -->
         @if (activeTab() === 'info') {
-        <div class="p-6 tab-content-animate">
+        <div class="tab-content-animate">
           <div class="space-y-4">
             <div class="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
-              <h3 class="font-medium text-primary-700 mb-2">Description</h3>
+              <h3 class="font-medium text-blue-700 mb-2">Description</h3>
               <p class="text-neutral-700">{{ description | async }}</p>
             </div>
 
             <div class="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
-              <h3 class="font-medium text-primary-700 mb-2">
-                Genomic Location
-              </h3>
+              <h3 class="font-medium text-blue-700 mb-2">Genomic Location</h3>
               <p class="text-neutral-700 font-mono">
                 {{ gene.chr }}:{{ gene.range?.start }}-{{ gene.range?.end }}
                 @if (gene.strand) {
                 <span
-                  class="ml-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs"
+                  class="ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs"
                   >{{ gene.strand }} strand</span
                 >
                 }
@@ -96,7 +71,7 @@ export interface GeneModalData {
 
         <!-- Pathways Tab -->
         @if (activeTab() === 'pathways') {
-        <div class="p-6 tab-content-animate">
+        <div class="tab-content-animate">
           @if (pathways.length === 0) {
           <div
             class="text-center py-12 bg-neutral-50 rounded-lg border border-neutral-200"
@@ -190,8 +165,8 @@ export interface GeneModalData {
         }
       </div>
 
-      <!-- Fixed Footer -->
-      <div class="p-6 pt-4 border-t bg-white">
+      <!-- Footer -->
+      <ng-template #footer>
         <div class="flex justify-end">
           <button
             class="action-btn px-5 py-2.5 rounded-full"
@@ -200,42 +175,37 @@ export interface GeneModalData {
             Close
           </button>
         </div>
-      </div>
-    </div>
+      </ng-template>
+    </lib-base-dialog>
   `,
   styles: [
     `
-      :host {
-        display: block;
-        height: 100%;
-        max-height: 90vh;
-      }
-
       .pill-tab {
-        background-color: var(--color-neutral-100);
-        color: var(--color-neutral-700);
-        transition: all var(--transition-normal);
-        border: 1px solid var(--color-neutral-200);
+        background-color: #f5f5f5;
+        color: #374151;
+        transition: all 0.2s ease;
+        border: 1px solid #e5e5e5;
         display: flex;
         align-items: center;
         position: relative;
-        border-radius: 9999px; /* full rounded */
+        border-radius: 9999px;
         padding: 0.5rem 1rem;
-        font-size: var(--text-sm);
+        font-size: 0.875rem;
         font-weight: 500;
+        cursor: pointer;
       }
 
       .pill-tab:hover {
-        background-color: var(--color-primary-50);
-        color: var(--color-primary-600);
-        box-shadow: var(--shadow-sm);
+        background-color: #f0f9ff;
+        color: #2563eb;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       }
 
       .pill-tab.active {
-        background-color: var(--color-primary-100);
-        color: var(--color-primary-700);
-        border-color: var(--color-primary-300);
-        box-shadow: var(--shadow-sm);
+        background-color: #dbeafe;
+        color: #1d4ed8;
+        border-color: #93c5fd;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       }
 
       .track-count {
@@ -248,47 +218,48 @@ export interface GeneModalData {
         border-radius: 10px;
         font-size: 0.75rem;
         font-weight: 500;
-        background-color: var(--color-neutral-200);
-        color: var(--color-neutral-700);
-        transition: all var(--transition-normal);
+        background-color: #e5e5e5;
+        color: #374151;
+        transition: all 0.2s ease;
         margin-left: 0.25rem;
       }
 
       .pill-tab:hover .track-count {
-        background-color: var(--color-primary-200);
-        color: var(--color-primary-700);
+        background-color: #bfdbfe;
+        color: #1d4ed8;
       }
 
       .pill-tab.active .track-count {
-        background-color: var(--color-primary-300);
-        color: var(--color-primary-800);
+        background-color: #93c5fd;
+        color: #1e40af;
       }
 
       .action-btn {
         transition: all 0.2s ease;
-        border: 1px solid var(--color-primary-200);
-        background-color: var(--color-primary-100);
-        color: var(--color-primary-700);
+        border: 1px solid #bfdbfe;
+        background-color: #dbeafe;
+        color: #1d4ed8;
         position: relative;
         overflow: hidden;
         transform-origin: center;
-        border-radius: var(--radius-md);
+        border-radius: 0.375rem;
         padding: 0.375rem 0.75rem;
-        font-size: var(--text-sm);
+        font-size: 0.875rem;
         font-weight: 500;
+        cursor: pointer;
       }
 
       .action-btn:hover {
-        background-color: var(--color-primary-200);
-        border-color: var(--color-primary-300);
+        background-color: #bfdbfe;
+        border-color: #93c5fd;
         transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2),
-          0 2px 4px -1px rgba(67, 56, 202, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2),
+          0 2px 4px -1px rgba(59, 130, 246, 0.1);
       }
 
       .action-btn:active {
         transform: translateY(0) scale(0.98);
-        background-color: var(--color-primary-300);
+        background-color: #93c5fd;
         box-shadow: none;
       }
 
@@ -306,13 +277,6 @@ export interface GeneModalData {
           opacity: 1;
           transform: translateY(0);
         }
-      }
-
-      ::ng-deep .cdk-dialog-container {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 1rem !important;
       }
     `,
   ],
