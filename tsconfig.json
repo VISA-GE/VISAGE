@@ -10,9 +10,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "ngx-igv": [
-        "./dist/ngx-igv"
-      ]
     },
     "skipLibCheck": true,
     "isolatedModules": true,

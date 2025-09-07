@@ -7,7 +7,8 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import { Location, Track } from 'ngx-igv';
+
+import { Location, Track } from './app/genome-views/igv/igv.component';
 
 import { decompressSync, strFromU8 } from 'fflate';
 import { genomes } from './assets/genomes/genomes';

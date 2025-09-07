@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { State } from '../../../state.store';
-import { Track } from 'ngx-igv';
+import { Track } from '../../genome-views/igv/igv.component';
 import { ToastService } from '../../services/toast/toast.service';
 
 // Define FileFormat interface

@@ -1,7 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { TrackMetadata, UcscService } from '../../services/ucsc/ucsc.service';
 import { State } from '../../../state.store';
-import { Track } from 'ngx-igv';
+import { Track } from '../../genome-views/igv/igv.component';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast/toast.service';
 import { LoadingComponent } from '../../components/loading/loading.component';
