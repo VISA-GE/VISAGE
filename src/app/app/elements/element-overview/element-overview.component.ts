@@ -1,6 +1,7 @@
 import { Component, effect, inject, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
-import { State } from '../../../state.store';
+import { State, MAX_REGION_SIZE } from '../../../state.store';
 import { ElementSelectorComponent } from '../element-selector/element-selector.component';
 import { ElementTrackerComponent } from '../element-tracker/element-tracker.component';
 import { RegionNameDialogComponent } from '../../components/region-name-dialog/region-name-dialog.component';
@@ -8,7 +9,7 @@ import { RegionNameDialogComponent } from '../../components/region-name-dialog/r
 @Component({
   selector: 'app-element-overview',
   standalone: true,
-  imports: [ElementSelectorComponent, ElementTrackerComponent],
+  imports: [CommonModule, ElementSelectorComponent, ElementTrackerComponent],
   templateUrl: './element-overview.component.html',
   styleUrl: './element-overview.component.css',
 })
@@ -19,6 +20,58 @@ export class ElementOverviewComponent {
   selectedRegions = computed(() => this.state.selectedRegions());
   location = this.state.location;
   isFetchingSNPs = false;
+  isRegionTooLarge = computed(() => {
+    const loc = this.location();
+    if (!loc.range) return false;
+    return Math.abs(loc.range.end - loc.range.start) >= MAX_REGION_SIZE;
+  });
+
+  // Disabled states and reasons
+  isSaveDisabled = computed(
+    () =>
+      this.location().chr === 'all' ||
+      !this.location().range ||
+      this.isRegionTooLarge()
+  );
+
+  saveDisabledReason = computed(() => {
+    if (this.location().chr === 'all') {
+      return 'You are viewing the whole genome. Zoom to a specific chromosome to save a region.';
+    }
+    if (!this.location().range) {
+      return 'No specific range is selected. Drag to select a region or zoom in further.';
+    }
+    if (this.isRegionTooLarge()) {
+      return 'This region is 1 Mb or larger. Zoom in so the region is smaller than 1 Mb to save it.';
+    }
+    return null;
+  });
+
+  isSelectDisabled = computed(() => this.visibleGenesCount() > 20);
+  selectDisabledReason = computed(() =>
+    this.visibleGenesCount() > 20
+      ? 'There are more than 20 visible genes. Zoom in or filter to reduce the number before selecting all.'
+      : null
+  );
+
+  isFetchDisabled = computed(
+    () =>
+      this.location().chr === 'all' ||
+      !this.location().range ||
+      this.isFetchingSNPs
+  );
+  fetchDisabledReason = computed(() => {
+    if (this.location().chr === 'all') {
+      return 'Cannot fetch SNPs for the whole genome. Zoom to a specific chromosome and region.';
+    }
+    if (!this.location().range) {
+      return 'No region selected. Zoom in or select a range to fetch SNPs.';
+    }
+    if (this.isFetchingSNPs) {
+      return 'Fetching in progress. Please wait until the current request finishes.';
+    }
+    return null;
+  });
 
   selectAllVisibleGenes(): void {
     const visibleGenes = this.state.visibleGenes();

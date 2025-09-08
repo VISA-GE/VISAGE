@@ -163,6 +163,8 @@ export interface GeneProductSearchResult {
   pageInfo: PageInfo;
 }
 
+export const MAX_REGION_SIZE = 1_000_000; // 1 Mb
+
 export const State = signalStore(
   {
     providedIn: 'root',
@@ -181,6 +183,20 @@ export const State = signalStore(
 
       if (isDuplicate) {
         toastService.warning(`Region "${region.name}" is already selected!`);
+        return;
+      }
+
+      // Validate region size (< 1 Mb)
+      const range = region.range;
+      if (!range || range.start === undefined || range.end === undefined) {
+        toastService.warning('Cannot add region: invalid range');
+        return;
+      }
+      const regionSize = Math.abs(range.end - range.start);
+      if (regionSize >= MAX_REGION_SIZE) {
+        toastService.warning(
+          `Region "${region.name}" is too large (>= 1 Mb) and was not added`
+        );
         return;
       }
 
@@ -263,7 +279,21 @@ export const State = signalStore(
         }
       },
       setSelectedRegions: (regions: NamedGenomicRange[]) => {
-        patchState(store, { selectedRegions: regions });
+        const filtered = regions.filter((r) => {
+          const range = r.range;
+          if (!range || range.start === undefined || range.end === undefined)
+            return false;
+          return Math.abs(range.end - range.start) < MAX_REGION_SIZE;
+        });
+
+        if (filtered.length !== regions.length) {
+          const excluded = regions.length - filtered.length;
+          toastService.warning(
+            `${excluded} region(s) were too large (>= 1 Mb) and were excluded`
+          );
+        }
+
+        patchState(store, { selectedRegions: filtered });
       },
       addCurrentLocationAsRegion: (name: string) => {
         const currentLocation = store.location();

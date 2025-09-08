@@ -24,34 +24,54 @@
 </div>
 
 <div class="flex gap-4 mt-4">
-  <button
-    class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-    [disabled]="location().chr === 'all' || !location().range" (click)="saveCurrentRegion()">
-    Save Current Region
-  </button>
-  <button
-    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-    [disabled]="visibleGenesCount() > 20" (click)="selectAllVisibleGenes()">
-    Select all {{ visibleGenesCount() }} visible genes
-  </button>
-  <button
-    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-    [disabled]="location().chr === 'all' || !location().range || isFetchingSNPs" (click)="fetchSNPsInVisibleRegion()">
-    @if (!isFetchingSNPs) {
-    Fetch SNPs in visible region
-    } @else {
-    <span class="flex items-center">
-      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-        </path>
-      </svg>
-      Fetching SNPs...
-    </span>
-    }
-  </button>
+  <div class="relative inline-block" [ngClass]="{ 'group': isSaveDisabled() }">
+    <button
+      class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      [disabled]="isSaveDisabled()" (click)="saveCurrentRegion()">
+      Save Current Region
+    </button>
+    <div
+      class="hidden group-hover:block absolute left-0 top-full mt-1 z-10 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded px-3 py-2 max-w-md shadow-lg">
+      {{ saveDisabledReason() }}
+    </div>
+  </div>
+
+  <div class="relative inline-block" [ngClass]="{ 'group': isSelectDisabled() }">
+    <button
+      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      [disabled]="isSelectDisabled()" (click)="selectAllVisibleGenes()">
+      Select all {{ visibleGenesCount() }} visible genes
+    </button>
+    <div
+      class="hidden group-hover:block absolute left-0 top-full mt-1 z-10 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded px-3 py-2 max-w-md shadow-lg">
+      {{ selectDisabledReason() }}
+    </div>
+  </div>
+
+  <div class="relative inline-block" [ngClass]="{ 'group': isFetchDisabled() }">
+    <button
+      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      [disabled]="isFetchDisabled()" (click)="fetchSNPsInVisibleRegion()">
+      @if (!isFetchingSNPs) {
+      Fetch SNPs in visible region
+      } @else {
+      <span class="flex items-center">
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+        Fetching SNPs...
+      </span>
+      }
+    </button>
+    <div
+      class="hidden group-hover:block absolute left-0 top-full mt-1 z-10 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded px-3 py-2 max-w-md shadow-lg">
+      {{ fetchDisabledReason() }}
+    </div>
+  </div>
 </div>
 
 @if (isFetchingSNPs) {
