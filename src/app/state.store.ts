@@ -86,10 +86,10 @@ const initialState: VisageState = {
   location: {
     chr: 'all',
   },
-  genomeId: 'hg38',
-  page: 'custom-upload',
+  genomeId: null,
+  page: 'igv',
   tracks: [],
-  geneNames: new Set(['SOX10']),
+  geneNames: new Set(),
   snps: [],
   selectedRegions: [],
   searchedRegions: [],
