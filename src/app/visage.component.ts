@@ -56,6 +56,24 @@ export class VisageComponent {
     }
   }
 
+  @Input({ alias: 'tracks' })
+  set tracks(value: string | null) {
+    if (value) {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          this.state.setTracks(parsed);
+        } else {
+          console.warn('tracks must be a JSON array');
+        }
+      } catch (error) {
+        console.warn('Invalid JSON format for tracks:', error);
+      }
+    } else {
+      this.state.setTracks([]);
+    }
+  }
+
   state = inject(State);
   hasGenome = computed(() => this.state.genomeId() !== null);
 

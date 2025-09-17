@@ -237,6 +237,36 @@ export const State = signalStore(
         // Show success toast when track is successfully added
         toastService.success(`Track "${track.name}" successfully added!`);
       },
+      setTracks: (tracks: Track[]) => {
+        // Basic validation: require name and url strings
+        const valid = tracks.filter(
+          (t) =>
+            t && typeof t.name === 'string' && t.name.length > 0 && typeof t.url === 'string' && t.url.length > 0
+        );
+
+        // Deduplicate by name or url (keep first occurrence)
+        const seenByName = new Set<string>();
+        const seenByUrl = new Set<string>();
+        const deduped: Track[] = [];
+        for (const t of valid) {
+          if (seenByName.has(t.name) || seenByUrl.has(t.url)) {
+            continue;
+          }
+          seenByName.add(t.name);
+          seenByUrl.add(t.url);
+          deduped.push(t);
+        }
+
+        const removedCount = tracks.length - deduped.length;
+        patchState(store, { tracks: deduped });
+
+        if (deduped.length > 0) {
+          toastService.success(`Loaded ${deduped.length} track(s)`);
+        }
+        if (removedCount > 0) {
+          toastService.warning(`${removedCount} duplicate/invalid track(s) were ignored`);
+        }
+      },
       removeTrack: (trackName: string) => {
         const existingTracks = store.tracks();
         const updatedTracks = existingTracks.filter(

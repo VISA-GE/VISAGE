@@ -11,6 +11,7 @@ The main component `VisageComponent` provides the following interfaces for integ
 - **`genome-id`** (string | null): Sets the genome identifier for visualization
 - **`selected-genes`** (string | null): Comma-separated list of gene names to highlight
 - **`selected-regions`** (string | null): JSON array of genomic regions to display
+- **`tracks`** (string | null): JSON array of IGV track objects to load
 
 ### Output Events
 
@@ -25,10 +26,54 @@ The main component `VisageComponent` provides the following interfaces for integ
   [genome-id]="'hg38'"
   [selected-genes]="'BRCA1,BRCA2'"
   [selected-regions]="'[{\"chr\":\"chr17\",\"start\":43000000,\"end\":43100000}]'"
+  [tracks]="'[{\"name\":\"Variants\",\"type\":\"variant\",\"format\":\"vcf\",\"url\":\"https://example.org/variants.vcf.gz\",\"indexURL\":\"https://example.org/variants.vcf.gz.tbi\"}]'"
   (genomeIdChange)="onGenomeChange($event)"
   (selectedGenesChange)="onGenesChange($event)"
   (selectedRegionsChange)="onRegionsChange($event)">
 </visage-component>
+### Tracks Input
+
+Provide an array of track definitions as a JSON string. The shape follows the `Track` interface below. Invalid entries (missing `name` or `url`) and duplicates (same `name` or `url`) are ignored. When set, the list replaces any existing tracks in the component state.
+
+Example (as attribute on the custom element):
+
+```html
+<visa-ge genome-id="mm10" tracks='[
+  {"name":"RefSeq Genes","type":"annotation","format":"refgene","url":"/assets/refgene.gz"},
+  {"name":"My Peaks","type":"annotation","format":"bed","url":"https://example.org/peaks.bed"}
+]'></visa-ge>
+```
+
+### Using Blob URLs
+
+You can create Blob URLs at runtime and pass them via the `tracks` JSON. This is useful for user-provided files or dynamically generated content.
+
+```html
+<script>
+  // Example: user uploads a BED file
+  async function attachUploadedBed(file) {
+    const url = URL.createObjectURL(file);
+    const tracks = [
+      { name: 'Uploaded BED', type: 'annotation', format: 'bed', url }
+    ];
+    const el = document.querySelector('visa-ge');
+    el.setAttribute('tracks', JSON.stringify(tracks));
+  }
+
+  // Example: dynamically generate a small VCF in the browser
+  function attachGeneratedVCF() {
+    const header = '##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n';
+    const rows = ['chr1\t10001\trs1\tA\tG\t.\t.\t.'];
+    const blob = new Blob([header + rows.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const tracks = [
+      { name: 'Generated VCF', type: 'variant', format: 'vcf', url, displayMode: 'EXPANDED' }
+    ];
+    const el = document.querySelector('visa-ge');
+    el.setAttribute('tracks', JSON.stringify(tracks));
+  }
+</script>
+```
 ```
 
 ### Data Interfaces
