@@ -7,6 +7,7 @@ import {
   effect,
   inject,
   ViewEncapsulation,
+  signal,
 } from '@angular/core';
 import { State } from './state.store';
 import { GenomeSelectorComponent } from './genome-selector/genome-selector.component';
@@ -75,16 +76,18 @@ export class VisageComponent {
   }
 
   // Visibility signal plumbed from index.html to IGV component
-  visibilitySignal: number | null = null;
+  private _visibilitySignal = signal<number | null>(null);
+  visibilitySignal = this._visibilitySignal;
 
   @Input({ alias: 'visibility-signal' })
   set visibilitySignalInput(value: string | number | null) {
     if (value === null || value === undefined || value === '') {
-      this.visibilitySignal = null;
+      this._visibilitySignal.set(null);
       return;
     }
     const num = typeof value === 'number' ? value : Number(value);
-    this.visibilitySignal = Number.isFinite(num) ? num : Date.now();
+    const parsed = Number.isFinite(num) ? num : Date.now();
+    this._visibilitySignal.set(parsed);
   }
 
   state = inject(State);

@@ -10,7 +10,7 @@
     }
     @case ('igv') {
     <app-element-overview></app-element-overview>
-    <lib-igv [visibilitySignal]="visibilitySignal"></lib-igv>
+    <lib-igv [visibilitySignal]="visibilitySignal()"></lib-igv>
     }
     @case ('genes') {
     <lib-genes></lib-genes>

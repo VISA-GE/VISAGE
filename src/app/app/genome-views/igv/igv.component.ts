@@ -3,17 +3,16 @@ import {
   computed,
   effect,
   inject,
-  model,
   ElementRef,
   viewChild,
   OnDestroy,
-  Input,
+  input,
 } from '@angular/core';
 import { ResourceRef, resource } from '@angular/core';
 import { isEqual } from 'lodash-es';
 import { State } from '../../../state.store';
 
-//@ts-ignore
+//@ts-ignore  
 declare const igv: any;
 
 export interface Location {
@@ -80,7 +79,7 @@ export interface Reference {
   styleUrl: './igv.component.css',
 })
 export class IgvComponent implements OnDestroy {
-  @Input() visibilitySignal: number | null = null;
+  visibilitySignal = input<number | null>(null);
   state = inject(State);
   genome$ = this.state.genome;
   tracks$ = this.state.allTracks;
@@ -216,7 +215,7 @@ export class IgvComponent implements OnDestroy {
   });
 
   visibilitySignal$ = effect(() => {
-    const signal = this.visibilitySignal;
+    const signal = this.visibilitySignal();
     if (signal === null || signal === undefined) {
       return;
     }
