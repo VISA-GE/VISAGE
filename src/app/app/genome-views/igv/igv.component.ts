@@ -219,6 +219,7 @@ export class IgvComponent implements OnDestroy {
     if (signal === null || signal === undefined) {
       return;
     }
+    console.debug('[VISAGE: IgvComponent] calling visibilityChange()');
     const browser = this.browser$.value();
     if (browser && typeof browser.visibilityChange === 'function') {
       browser.visibilityChange();
