@@ -1,4 +1,4 @@
-import { Component, effect, inject, computed } from '@angular/core';
+import { Component, effect, inject, computed, Input } from '@angular/core';
 import { State } from '../state.store';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { TrackHubsComponent } from './data-sources/track-hubs/track-hubs.component';
@@ -28,4 +28,5 @@ import { ToastContainerComponent } from './components/toast-container/toast-cont
 export class AppComponent {
   state = inject(State);
   page = this.state.page;
+  @Input() visibilitySignal: number | null = null;
 }

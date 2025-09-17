@@ -74,6 +74,19 @@ export class VisageComponent {
     }
   }
 
+  // Visibility signal plumbed from index.html to IGV component
+  visibilitySignal: number | null = null;
+
+  @Input({ alias: 'visibility-signal' })
+  set visibilitySignalInput(value: string | number | null) {
+    if (value === null || value === undefined || value === '') {
+      this.visibilitySignal = null;
+      return;
+    }
+    const num = typeof value === 'number' ? value : Number(value);
+    this.visibilitySignal = Number.isFinite(num) ? num : Date.now();
+  }
+
   state = inject(State);
   hasGenome = computed(() => this.state.genomeId() !== null);
 

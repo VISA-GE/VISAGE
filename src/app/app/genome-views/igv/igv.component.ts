@@ -7,6 +7,7 @@ import {
   ElementRef,
   viewChild,
   OnDestroy,
+  Input,
 } from '@angular/core';
 import { ResourceRef, resource } from '@angular/core';
 import { isEqual } from 'lodash-es';
@@ -79,6 +80,7 @@ export interface Reference {
   styleUrl: './igv.component.css',
 })
 export class IgvComponent implements OnDestroy {
+  @Input() visibilitySignal: number | null = null;
   state = inject(State);
   genome$ = this.state.genome;
   tracks$ = this.state.allTracks;
@@ -211,6 +213,22 @@ export class IgvComponent implements OnDestroy {
       await browser.loadTrack(track);
       this.visibilityChange(browser);
     });
+  });
+
+  visibilitySignal$ = effect(() => {
+    const signal = this.visibilitySignal;
+    if (signal === null || signal === undefined) {
+      return;
+    }
+    const browser = this.browser$.value();
+    if (browser && typeof browser.visibilityChange === 'function') {
+      browser.visibilityChange();
+    } else if (typeof igv !== 'undefined' && igv) {
+      // Fallback in case browser isn't ready yet; global igv has the method
+      try {
+        igv.visibilityChange();
+      } catch {}
+    }
   });
 
   constructor() {

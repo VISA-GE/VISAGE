@@ -1,6 +1,6 @@
 @if (hasGenome()) {
 <div>
-  <lib-app></lib-app>
+  <lib-app [visibilitySignal]="visibilitySignal"></lib-app>
 </div>
 } @else {
 <lib-genome-selector></lib-genome-selector>

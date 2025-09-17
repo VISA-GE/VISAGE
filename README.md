@@ -12,6 +12,7 @@ The main component `VisageComponent` provides the following interfaces for integ
 - **`selected-genes`** (string | null): Comma-separated list of gene names to highlight
 - **`selected-regions`** (string | null): JSON array of genomic regions to display
 - **`tracks`** (string | null): JSON array of IGV track objects to load
+- **`visibility-signal`** (number | string | null): Any change triggers IGV `visibilityChange()`
 
 ### Output Events
 
@@ -31,9 +32,33 @@ The main component `VisageComponent` provides the following interfaces for integ
   (selectedGenesChange)="onGenesChange($event)"
   (selectedRegionsChange)="onRegionsChange($event)">
 </visage-component>
+
+<!-- Trigger IGV visibility refresh from host page by bumping the signal -->
+<script>
+  const el = document.querySelector('visa-ge');
+  let tick = 0;
+  function triggerIGVVisibility() {
+    el.setAttribute('visibility-signal', String(++tick));
+  }
+  // Example: call after tab becomes visible or layout changes
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') triggerIGVVisibility();
+  });
+  window.addEventListener('resize', triggerIGVVisibility);
+}</script>
 ### Tracks Input
 
-Provide an array of track definitions as a JSON string. The shape follows the `Track` interface below. Invalid entries (missing `name` or `url`) and duplicates (same `name` or `url`) are ignored. When set, the list replaces any existing tracks in the component state.
+Visage is exposed as a web component (custom element). Web components receive attributes as strings, so complex values like arrays must be passed as JSON strings. The `tracks` input accepts a JSON-serialized array of IGV track definitions and replaces the current set of tracks when changed.
+
+What this means in practice:
+- You construct a regular JavaScript array of track objects (shape described by the `Track` interface).
+- You convert it to a string with `JSON.stringify(tracks)`.
+- You set that string on the `tracks` attribute of the `<visa-ge>` element.
+
+Behavior and safeguards:
+- **Validation**: items missing required fields (`name`, `url`) are skipped.
+- **Deduplication**: duplicates by `name` or by `url` are ignored (first occurrence wins).
+- **Replace semantics**: every time you set the `tracks` attribute, the component replaces its internal list of tracks with the validated, de-duplicated array you provided.
 
 Example (as attribute on the custom element):
 
@@ -46,7 +71,13 @@ Example (as attribute on the custom element):
 
 ### Using Blob URLs
 
-You can create Blob URLs at runtime and pass them via the `tracks` JSON. This is useful for user-provided files or dynamically generated content.
+Sometimes your data does not live at a fixed URL (e.g., a file the user drags-and-drops or content generated in memory). In those cases, you can create a temporary object URL with `URL.createObjectURL(...)` and pass that URL in a track definition. IGV.js can read from these blob-backed URLs just like from remote files.
+
+Typical use cases:
+- **User uploads**: accept files from `<input type="file">` and visualize immediately, without any server upload.
+- **On-the-fly generation**: build small VCF/BED content client-side (e.g., results of a quick filter) and preview in the browser.
+
+Lifecycle note: When the blob is no longer needed, call `URL.revokeObjectURL(url)` to release memory. If you later want to refresh visibility/size after mounting or layout changes, see the section below about `visibility-signal`.
 
 ```html
 <script>
@@ -75,6 +106,20 @@ You can create Blob URLs at runtime and pass them via the `tracks` JSON. This is
 </script>
 ```
 ```
+
+### Triggering IGV visibility updates from the host page
+
+Browsers can change layout or visibility (tab switches, container show/hide, resizes) in ways that make IGV's tracks temporarily miscalculate sizes. To handle this, IGV.js exposes `visibilityChange()` to re-measure and repaint. Visage provides a simple, attribute-based trigger that you can bump whenever your host page layout changes.
+
+How it works:
+- The custom element accepts a `visibility-signal` attribute (string or number).
+- Any change to this value (e.g., incrementing a counter) causes Visage to call `IGV.js`'s `visibilityChange()` internally.
+- You decide when to bump it: on tab activation, after a sidebar toggles, on window resize, etc.
+
+Example strategy:
+- Maintain a counter in your host page and write it to `visibility-signal` whenever a relevant event occurs. You don’t need specific values; only changes matter.
+
+This avoids direct refs into the Visage internals and keeps the integration purely declarative and DOM-based.
 
 ### Data Interfaces
 
