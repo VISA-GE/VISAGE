@@ -35,7 +35,7 @@ export class VisageComponent {
       .split(',')
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
-    this.state.setGeneNames(parsed);
+    this.state.setAndValidateGeneNames(parsed);
   }
 
   @Input({ alias: 'selected-regions' })
@@ -73,6 +73,14 @@ export class VisageComponent {
     effect(() => {
       const currentRegions = this.state.selectedRegions();
       this.selectedRegionsChange.emit(JSON.stringify(currentRegions));
+    });
+
+    // Validate existing genes when reference genome data loads
+    effect(() => {
+      const genes = this.state.genes.value();
+      if (genes) {
+        this.state.validateExistingGenes();
+      }
     });
   }
 }

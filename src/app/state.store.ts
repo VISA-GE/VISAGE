@@ -503,40 +503,163 @@ export const State = signalStore(
       return [...store.tracks(), snpTrack];
     }),
   })),
-  withMethods((store) => ({
-    focusGene: (geneName: string) => {
-      const gene = store.genes.value()?.find((g) => g.name === geneName);
-      if (gene) {
-        const range = gene.range!;
-        const length = range.end - range.start;
-        const location: Location = {
-          chr: gene.chr,
-          range: {
-            start: Math.floor(range.start - length / 2),
-            end: Math.ceil(range.end + length / 2),
-          },
-        };
-        store.setLocation(location);
+  withMethods((store) => {
+    const toastService = inject(ToastService);
+
+    // Helper function to validate and find gene with case-insensitive matching
+    const validateAndFindGene = (geneName: string): string | null => {
+      const genes = store.genes.value();
+      if (!genes) {
+        // If genes aren't loaded yet, we can't validate
+        return geneName; // Allow it for now, validation will happen when genes load
       }
-    },
-  })),
-  withMethods((store) => ({
-    addGeneName: (geneName: string) => {
-      patchState(store, {
-        geneNames: new Set(store.geneNames()).add(geneName),
+
+      // First try exact match
+      const exactMatch = genes.find((g: NamedGenomicRange) => g.name === geneName);
+      if (exactMatch) {
+        return exactMatch.name;
+      }
+
+      // Then try case-insensitive match
+      const caseInsensitiveMatch = genes.find(
+        (g: NamedGenomicRange) => g.name.toLowerCase() === geneName.toLowerCase()
+      );
+      if (caseInsensitiveMatch) {
+        return caseInsensitiveMatch.name;
+      }
+
+      // No match found
+      return null;
+    };
+
+    // Normalize a list of gene names against reference, and separate invalid/duplicates
+    const normalizeGeneList = (
+      inputGeneNames: string[],
+      currentGeneSet: Set<string>
+    ): { validated: string[]; invalid: string[]; duplicates: string[] } => {
+      const validated: string[] = [];
+      const invalid: string[] = [];
+      const duplicates: string[] = [];
+
+      inputGeneNames.forEach((raw) => {
+        const validatedName = validateAndFindGene(raw);
+        if (!validatedName) {
+          invalid.push(raw);
+          return;
+        }
+        if (currentGeneSet.has(validatedName)) {
+          duplicates.push(validatedName);
+          return;
+        }
+        validated.push(validatedName);
       });
-      store.focusGene(geneName);
-    },
+
+      return { validated, invalid, duplicates };
+    };
+
+    // Apply a validated set to the store, with replace/append behavior and toasts
+    const applyGeneNames = (
+      validated: string[],
+      invalid: string[],
+      duplicates: string[],
+      mode: 'append' | 'replace'
+    ) => {
+      // Warnings
+      invalid.forEach((name) =>
+        toastService.warning(`Gene "${name}" not found in reference genome`)
+      );
+      duplicates.forEach((name) =>
+        toastService.warning(`Gene "${name}" is already selected`)
+      );
+
+      const current = store.geneNames();
+      const next = mode === 'replace' ? new Set<string>() : new Set(current);
+      validated.forEach((v) => next.add(v));
+
+      // Success
+      if (validated.length > 0) {
+        const verb = mode === 'replace' ? 'Loaded' : 'Added';
+        toastService.success(`${verb} ${validated.length} gene(s): ${validated.join(', ')}`);
+      }
+
+      patchState(store, { geneNames: next });
+    };
+
+    return {
+      focusGene: (geneName: string) => {
+        const gene = store.genes.value()?.find((g) => g.name === geneName);
+        if (gene) {
+          const range = gene.range!;
+          const length = range.end - range.start;
+          const location: Location = {
+            chr: gene.chr,
+            range: {
+              start: Math.floor(range.start - length / 2),
+              end: Math.ceil(range.end + length / 2),
+            },
+          };
+          store.setLocation(location);
+        }
+      },
+      addGeneName: (geneName: string) => {
+        const current = store.geneNames();
+        const { validated, invalid, duplicates } = normalizeGeneList(
+          [geneName],
+          current
+        );
+        applyGeneNames(validated, invalid, duplicates, 'append');
+      },
+      addGeneNames: (geneNames: string[]) => {
+        const current = store.geneNames();
+        const { validated, invalid, duplicates } = normalizeGeneList(
+          geneNames,
+          current
+        );
+        applyGeneNames(validated, invalid, duplicates, 'append');
+      },
+      // Set genes with validation (used for initial gene loading)
+      setAndValidateGeneNames: (geneNames: string[]) => {
+        const genesLoaded = !!store.genes.value();
+        if (!genesLoaded) {
+          // If genes aren't loaded yet, just set them without validation.
+          // They will be validated when the genes resource loads.
+          patchState(store, { geneNames: new Set(geneNames) });
+          return;
+        }
+
+        const { validated, invalid } = normalizeGeneList(
+          geneNames,
+          new Set<string>()
+        );
+        // No duplicates in replace mode, because current set is empty
+        applyGeneNames(validated, invalid, [], 'replace');
+      },
+      // Re-validate genes when reference genome loads
+      validateExistingGenes: () => {
+        const currentArray = Array.from(store.geneNames());
+        const genes = store.genes.value();
+        if (!genes || currentArray.length === 0) return;
+
+        // In replace mode, duplicates are irrelevant; revalidate the current set
+        const { validated, invalid } = normalizeGeneList(
+          currentArray,
+          new Set<string>()
+        );
+
+        // Only update if there were invalids or case-normalizations
+        const caseChange =
+          validated.length === currentArray.length &&
+          validated.some((v, i) => v !== currentArray[i]);
+        if (invalid.length > 0 || caseChange) {
+          applyGeneNames(validated, invalid, [], 'replace');
+        }
+      },
+    };
+  }),
+  withMethods((store) => ({
     removeGeneName: (geneName: string) => {
       const newGeneNames = new Set(store.geneNames());
       newGeneNames.delete(geneName);
-      patchState(store, {
-        geneNames: newGeneNames,
-      });
-    },
-    addGeneNames: (geneNames: string[]) => {
-      const newGeneNames = new Set(store.geneNames());
-      geneNames.forEach((geneName) => newGeneNames.add(geneName));
       patchState(store, {
         geneNames: newGeneNames,
       });

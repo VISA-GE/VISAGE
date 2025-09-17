@@ -52,6 +52,7 @@ export class ElementSelectorComponent {
 
   handleGeneSelection(geneName: string): void {
     this.state.addGeneName(geneName);
+    this.state.focusGene(geneName);
     this.currentGeneInput.set('');
     this.showDropdown.set(false);
   }
