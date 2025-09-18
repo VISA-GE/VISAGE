@@ -85,6 +85,8 @@ export class IgvComponent implements OnDestroy {
   tracks$ = this.state.allTracks;
   location$ = this.state.location;
 
+  isInitialized = false;
+
   lastLocationUpdate = 0;
   igvDiv$ = viewChild<ElementRef<HTMLDivElement>>('igv');
 
@@ -219,7 +221,6 @@ export class IgvComponent implements OnDestroy {
     if (signal === null || signal === undefined) {
       return;
     }
-    console.debug('[VISAGE: IgvComponent] calling visibilityChange()');
     const browser = this.browser$.value();
     if (browser && typeof browser.visibilityChange === 'function') {
       browser.visibilityChange();
@@ -244,6 +245,16 @@ export class IgvComponent implements OnDestroy {
       return;
     }
     this.lastLocationUpdate = now;
+
+    if (!this.isInitialized) {
+      if (location.chr == 'all') {
+        // There is always one attempt to set the location to all
+        // We need to prevent this from being propagated to the state
+        this.isInitialized = true;
+      }
+      return;
+    }
+
     this.state.setLocation(location);
   }
 
