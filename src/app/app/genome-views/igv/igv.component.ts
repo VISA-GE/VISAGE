@@ -263,7 +263,7 @@ export class IgvComponent implements OnDestroy {
 
     this.locationChangeCounter++;
 
-    console.debug('[VISAGE: IgvComponent] onLocationChange called with location ', location.chr);
+    
 
     this.state.setLocation(location);
   }

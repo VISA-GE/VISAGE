@@ -173,6 +173,14 @@ export const State = signalStore(
   withState(initialState),
   withMethods((store) => {
     const toastService = inject(ToastService);
+    // Strict gene name matcher: exact case-insensitive match only
+    const findMatchingGene = (
+      input: string,
+      genes: NamedGenomicRange[]
+    ): NamedGenomicRange | null => {
+      const q = input.toLowerCase();
+      return genes.find((g) => g.name.toLowerCase() === q) ?? null;
+    };
 
     // Helper function to add a region with duplicate checking
     const addRegionWithDuplicateCheck = (region: NamedGenomicRange) => {
@@ -342,6 +350,83 @@ export const State = signalStore(
 
         addRegionWithDuplicateCheck(region);
       },
+      // Parse string to set location by locus, selected-region name, or gene name
+      setLocationFromString: (
+        value: string | null | undefined,
+        options?: { deferIfGenesMissing?: boolean; silent?: boolean }
+      ) => {
+        const input = (value ?? '').trim();
+        if (input.length === 0) return;
+
+        const deferIfMissing = options?.deferIfGenesMissing !== false;
+        
+
+        // 1) explicit locus chr:start-end (chr prefix optional)
+        const locMatch = input.match(/^([^:]+):\s*(\d+)\s*-\s*(\d+)$/);
+        if (locMatch) {
+          const rawChr = locMatch[1];
+          const start = Number(locMatch[2]);
+          const end = Number(locMatch[3]);
+          if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+            let chr = rawChr;
+            const genes = (store as any).genes?.value?.();
+            if (genes) {
+              const hasChrPrefixed = genes.some((g: NamedGenomicRange) => g.chr === `chr${rawChr}`);
+              const hasRaw = genes.some((g: NamedGenomicRange) => g.chr === rawChr);
+              if (hasChrPrefixed && !hasRaw && !rawChr.startsWith('chr')) chr = `chr${rawChr}`;
+            }
+            
+            patchState(store, { location: { chr, range: { start, end } } });
+            return;
+          }
+        }
+
+        // 2) selected region match (exact case-insensitive)
+        const region = store
+          .selectedRegions()
+          .find((r) => r.name.toLowerCase() === input.toLowerCase());
+        if (region && region.range) {
+          patchState(store, { location: { chr: region.chr, range: { start: region.range.start, end: region.range.end } } });
+          return;
+        }
+
+        // 3) gene name (exact case-insensitive), may defer if genes missing
+        const genes = (store as any).genes?.value?.();
+        if (!genes) {
+          if (deferIfMissing) {
+            return false;
+          }
+        } else {
+          const geneList = genes as NamedGenomicRange[];
+          const gene = findMatchingGene(input, geneList);
+
+          // If not found in gene list, try matching against selected gene names
+          if (!gene) {
+            const selected = Array.from(store.geneNames());
+            const normalized = selected.find((n) => n.toLowerCase() === input.toLowerCase());
+            if (normalized) {
+              const matchedGene = geneList.find((g) => g.name === normalized);
+              if (matchedGene) {
+                const range = matchedGene.range!;
+                const length = range.end - range.start;
+                patchState(store, { location: { chr: matchedGene.chr, range: { start: Math.floor(range.start - length / 2), end: Math.ceil(range.end + length / 2) } } });
+                return;
+              }
+            }
+          } else {
+            const range = gene.range!;
+            const length = range.end - range.start;
+            patchState(store, { location: { chr: gene.chr, range: { start: Math.floor(range.start - length / 2), end: Math.ceil(range.end + length / 2) } } });
+            return;
+          }
+        }
+
+        // Final: could not interpret
+        if (!options?.silent) {
+          toastService.warning(`Could not interpret location: "${input}"`);
+        }
+        return false;
+      },
     };
   }),
   withComputed((store) => ({
@@ -483,12 +568,12 @@ export const State = signalStore(
     activeGenes: computed<NamedGenomicRange[]>(() =>
       Array.from(store.geneNames())
         .map((geneName) =>
-          store.genes.value()?.find((g) => g.name === geneName)
+          (store as any).genes?.value?.()?.find((g: NamedGenomicRange) => g.name === geneName)
         )
         .filter((g) => g !== undefined)
     ),
     visibleGenes: computed<NamedGenomicRange[]>(() => {
-      const genes = store.genes.value();
+      const genes = (store as any).genes?.value?.();
       const location = store.location();
       if (!genes) return [];
       if (location.chr === 'all') {
@@ -496,7 +581,7 @@ export const State = signalStore(
       }
       const locationRange = location.range;
       if (locationRange) {
-        return genes.filter((g) => {
+        return genes.filter((g: NamedGenomicRange) => {
           const range = g.range!;
           return (
             g.chr === location.chr &&
@@ -505,7 +590,7 @@ export const State = signalStore(
           );
         });
       } else {
-        return genes.filter((g) => g.chr === location.chr);
+        return genes.filter((g: NamedGenomicRange) => g.chr === location.chr);
       }
     }),
     genePathways: computed<Record<string, Pathway[]>>(() => {
@@ -538,7 +623,7 @@ export const State = signalStore(
 
     // Helper function to validate and find gene with case-insensitive matching
     const validateAndFindGene = (geneName: string): string | null => {
-      const genes = store.genes.value();
+      const genes = (store as any).genes?.value?.();
       if (!genes) {
         // If genes aren't loaded yet, we can't validate
         return geneName; // Allow it for now, validation will happen when genes load
@@ -617,7 +702,7 @@ export const State = signalStore(
 
     return {
       focusGene: (geneName: string) => {
-        const gene = store.genes.value()?.find((g) => g.name === geneName);
+        const gene = (store as any).genes?.value?.()?.find((g: NamedGenomicRange) => g.name === geneName);
         if (gene) {
           const range = gene.range!;
           const length = range.end - range.start;
@@ -630,6 +715,10 @@ export const State = signalStore(
           };
           store.setLocation(location);
         }
+      },
+      // Public helper: normalize a gene name the same way selected-genes does
+      resolveGeneName: (raw: string): string | null => {
+        return validateAndFindGene(raw);
       },
       addGeneName: (geneName: string) => {
         const current = store.geneNames();
@@ -649,7 +738,7 @@ export const State = signalStore(
       },
       // Set genes with validation (used for initial gene loading)
       setAndValidateGeneNames: (geneNames: string[]) => {
-        const genesLoaded = !!store.genes.value();
+        const genesLoaded = !!(store as any).genes?.value?.();
         if (!genesLoaded) {
           // If genes aren't loaded yet, just set them without validation.
           // They will be validated when the genes resource loads.
@@ -667,7 +756,7 @@ export const State = signalStore(
       // Re-validate genes when reference genome loads
       validateExistingGenes: () => {
         const currentArray = Array.from(store.geneNames());
-        const genes = store.genes.value();
+        const genes = (store as any).genes?.value?.();
         if (!genes || currentArray.length === 0) return;
 
         // In replace mode, duplicates are irrelevant; revalidate the current set

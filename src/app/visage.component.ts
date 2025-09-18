@@ -75,6 +75,27 @@ export class VisageComponent {
     }
   }
 
+  // Location control from host page
+  private _pendingLocation = signal<string | null>(null);
+  
+  @Input({ alias: 'location' })
+  set locationInput(value: string | null) {
+    const input = value?.trim() ?? '';
+    if (input.length === 0) {
+      this._pendingLocation.set(null);
+      return;
+    }
+    
+    // Try immediate parse (locus/region) - silent to avoid premature warnings
+    const handled = this.state.setLocationFromString(input, { deferIfGenesMissing: false, silent: true });
+    if (handled === false) {
+      // Looks like a gene but genes not loaded - store for later
+      this._pendingLocation.set(input);
+    } else {
+      this._pendingLocation.set(null);
+    }
+  }
+
   // Visibility signal plumbed from index.html to IGV component
   private _visibilitySignal = signal<number | null>(null);
   visibilitySignal = this._visibilitySignal;
@@ -115,6 +136,25 @@ export class VisageComponent {
       if (genes) {
         this.state.validateExistingGenes();
       }
+    });
+
+    // Resolve pending location when genes become available
+    effect(() => {
+      const pending = this._pendingLocation();
+      const genes = this.state.genes.value();
+      if (!pending) return;
+      if (!genes) return;
+      
+    // Normalize with the same logic as selected-genes, then focus
+    const normalized = this.state.resolveGeneName(pending);
+    if (normalized) {
+      this.state.focusGene(normalized);
+      this._pendingLocation.set(null);
+      return;
+    }
+    // Fallback: try generic parser silently
+    const handled = this.state.setLocationFromString(pending, { deferIfGenesMissing: false, silent: true });
+    if (handled !== false) this._pendingLocation.set(null);
     });
   }
 }
