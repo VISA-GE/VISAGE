@@ -86,6 +86,7 @@ export class IgvComponent implements OnDestroy {
   location$ = this.state.location;
 
   isInitialized = false;
+  locationChangeCounter = 0;
 
   lastLocationUpdate = 0;
   igvDiv$ = viewChild<ElementRef<HTMLDivElement>>('igv');
@@ -254,6 +255,15 @@ export class IgvComponent implements OnDestroy {
       }
       return;
     }
+
+    if (this.locationChangeCounter === 0) {
+      this.locationChangeCounter = 1;
+      return;
+    }
+
+    this.locationChangeCounter++;
+
+    console.debug('[VISAGE: IgvComponent] onLocationChange called with location ', location.chr);
 
     this.state.setLocation(location);
   }
