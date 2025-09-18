@@ -89,8 +89,6 @@ export class TrackHubsComponent {
       url: 'https://hgdownload.soe.ucsc.edu' + url,
     };
 
-    console.log('formattedTrack', formattedTrack);
-
     // The state store will handle duplicate checking and show appropriate toasts
     this.state.addTrack(formattedTrack);
   }

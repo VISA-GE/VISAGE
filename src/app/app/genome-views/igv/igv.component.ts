@@ -152,6 +152,10 @@ export class IgvComponent implements OnDestroy {
 
         // Emit track removal events for each removed track
         tracksArray.forEach((track) => {
+          if (!this.isInitialized || this.locationChangeCounter < 1) {
+            return;
+          }
+          
           if (track && track.name && track.name !== 'Refseq Genes') {
             this.onTrackRemoved(track.name);
           }
