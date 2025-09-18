@@ -182,6 +182,7 @@ export class IgvComponent implements OnDestroy {
     }
 
     browser.search(this.locString$());
+    this.lastLocationUpdate = Date.now();
     this.visibilityChange(browser);
   });
 
