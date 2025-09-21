@@ -1,6 +1,6 @@
 {
   "name": "@visa-ge/visage",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "main": "bundle.js",
   "scripts": {
     "ng": "ng",
