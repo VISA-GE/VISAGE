@@ -34,6 +34,7 @@
         @if (!section.collapsed) {
         <ul role="list" class="section-content -mx-2 mt-2 space-y-1" @expandCollapse>
           @for (item of section.children; track item.id) {
+          @if (!item.disabled) {
           <li>
             <a [id]="item.id" href="#" (click)="$event.preventDefault(); setActiveItem(item.id)"
               [class.active]="page() === item.id"
@@ -41,6 +42,7 @@
               <span class="nav-item-text truncate">{{ item.label }}</span>
             </a>
           </li>
+          }
           }
         </ul>
         }

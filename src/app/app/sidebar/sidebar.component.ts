@@ -64,6 +64,7 @@ export class SidebarComponent {
         {
           label: 'Drugst.One',
           id: 'drugst-one',
+          disabled: true,
         },
       ],
     },
