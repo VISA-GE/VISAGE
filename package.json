@@ -6,6 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:standalone": "npm run build && node ./scripts/build-standalone.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -39,6 +40,7 @@
     "@types/jasmine": "~5.1.0",
     "@types/lodash": "^4.17.20",
     "@types/lodash-es": "^4.17.12",
+    "esbuild": "^0.25.10",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
