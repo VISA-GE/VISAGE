@@ -38,7 +38,7 @@ try {
 }
 
 (async () => {
-  const outFile = path.join(outRoot, 'visage-standalone.iife.js');
+  const outFile = path.join(outRoot, 'visage.js');
   // Use a virtual entry that loads polyfills first, then main
   const entryContents = `import './polyfills.js';\nimport * as igv from 'igv';\nif (!window.igv) window.igv = igv;\nimport './main.js';`;
   await esbuild.build({
