@@ -1,6 +1,48 @@
-# Visage
+# VISAGE
 
-Visage is a genomic visualization component built with Angular that provides an interactive genome browser interface. This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.4.
+Visage is a genomic visualization component built with Angular that provides an interactive genome browser interface.
+
+## How to get VISAGE working in your application
+
+The optimal way for how to get VISAGE into your application depends on how your application is structured. If your are using a node-based frontend framework like React, Angular, Vue, etc., you can install VISAGE as an NPM package.
+
+If you want to use VISAGE in an application that does not use node, you can add VISAGE by sourcing the standalone JavaScript bundle and stylesheet directly from a CDN (e.g., jsDelivr).
+
+After either installation option, the `<visa-ge>` element is available and you can proceed with [the usage documentation](#how-to-use-the-custom-element).
+
+### Using NPM
+
+Install the package:
+
+```bash
+npm install @visa-ge/visage
+```
+
+Register the element by importing the package once at app startup (this executes the entry that defines `<visa-ge>`):
+
+```ts
+// e.g., in your app entry
+import '@visa-ge/visage';
+```
+
+Load the stylesheet:
+
+```html
+<link rel="stylesheet" href="/node_modules/@visa-ge/visage/dist/visage/styles.css">
+```
+
+### Using CDN / direct `<script>` (no build step)
+
+Use jsDelivr (mirrors npm):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@visa-ge/visage@<version>/dist/visage/visage-standalone.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@visa-ge/visage@<version>/dist/visage/styles.css">
+```
+
+## How to use the custom element
+
+The element usage is the same regardless of how you imported it.
 
 ## Component Interface
 
@@ -20,7 +62,7 @@ The main component `VisageComponent` provides the following interfaces for integ
 - **`selectedGenesChange`**: Emits when selected genes change (comma-separated string)
 - **`selectedRegionsChange`**: Emits when selected regions change (JSON string)
 
-### Usage Example
+### Usage Example (Web Component via NPM)
 
 ```html
 <visage-component 
@@ -46,6 +88,9 @@ The main component `VisageComponent` provides the following interfaces for integ
   });
   window.addEventListener('resize', triggerIGVVisibility);
 }</script>
+```
+
+
 ### Tracks Input
 
 Visage is exposed as a web component (custom element). Web components receive attributes as strings, so complex values like arrays must be passed as JSON strings. The `tracks` input accepts a JSON-serialized array of IGV track definitions and replaces the current set of tracks when changed.
@@ -104,8 +149,9 @@ Lifecycle note: When the blob is no longer needed, call `URL.revokeObjectURL(url
     el.setAttribute('tracks', JSON.stringify(tracks));
   }
 </script>
+
 ```
-```
+
 
 ### Triggering IGV visibility updates from the host page
 
