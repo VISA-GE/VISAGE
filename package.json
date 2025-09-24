@@ -5,8 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build:standalone": "npm run build && node ./scripts/build-standalone.js",
+    "build": "ng build && node ./scripts/build-standalone.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

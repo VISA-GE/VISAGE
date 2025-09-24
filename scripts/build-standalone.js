@@ -15,7 +15,7 @@ function copyFile(src, dest) {
 }
 
 const distRoot = path.resolve(__dirname, '..', 'dist', 'visage');
-const outRoot = path.resolve(__dirname, '..', 'dist', 'standalone');
+const outRoot = path.resolve(__dirname, '..', 'dist', 'visage');
 
 const polyfillsPath = path.join(distRoot, 'polyfills.js');
 const mainPath = path.join(distRoot, 'main.js');
@@ -60,16 +60,6 @@ try {
       'process.env.NODE_ENV': '"production"'
     }
   });
-
-  const cssSrc = path.join(distRoot, 'styles.css');
-  if (fs.existsSync(cssSrc)) {
-    copyFile(cssSrc, path.join(outRoot, 'styles.css'));
-  }
-
-  const favSrc = path.join(distRoot, 'favicon.ico');
-  if (fs.existsSync(favSrc)) {
-    copyFile(favSrc, path.join(outRoot, 'favicon.ico'));
-  }
 
   console.log(`[standalone] Wrote ${outFile}`);
 })().catch((err) => {
