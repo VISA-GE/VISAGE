@@ -36,8 +36,8 @@ Load the stylesheet:
 Use jsDelivr (mirrors npm):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@visa-ge/visage@<version>/dist/visage/visage-standalone.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@visa-ge/visage@<version>/dist/visage/styles.css">
+<script src="https://unpkg.com/@visa-ge/visage@latest/visage.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@visa-ge/visage@latest/styles.css">
 ```
 
 ## How to use the custom element
